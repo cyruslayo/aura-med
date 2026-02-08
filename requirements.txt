@@ -1,0 +1,7 @@
+torch
+transformers
+librosa
+pydantic
+ipython
+bitsandbytes
+accelerate
