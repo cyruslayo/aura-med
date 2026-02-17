@@ -1,15 +1,23 @@
-class DangerSignException(Exception):
-    """Raised when danger signs are detected, triggering immediate override."""
-    pass
+from src.datatypes import DangerSignException, LowQualityError, LowConfidenceError, EdgeConstraintViolation
 
-class LowQualityError(Exception):
-    """Raised when audio quality/duration is insufficient."""
-    pass
-
-class LowConfidenceError(Exception):
-    """Raised when model confidence is below threshold."""
-    pass
-
-class EdgeConstraintViolation(Exception):
-    """Raised when resource usage exceeds edge limits."""
-    pass
+class SafetyGuard:
+    """
+    Electronic Guardrail following WHO IMCI protocols.
+    """
+    @staticmethod
+    def check(vitals: "PatientVitals") -> None:
+        """
+        Check for general danger signs per WHO IMCI protocols.
+        
+        Args:
+            vitals: PatientVitals object
+            
+        Raises:
+            DangerSignException: If any emergency danger sign is present.
+        """
+        # H1: Rule-Based Override for Danger Signs
+        active_signs = vitals.danger_sign_details
+            
+        if active_signs:
+            signs_str = " and ".join(active_signs.keys())
+            raise DangerSignException(f"Emergency Danger Signs Detected! ({signs_str}) Immediate referral required.")

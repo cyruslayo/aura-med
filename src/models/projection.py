@@ -4,7 +4,7 @@ from src.config import PROJECTION_INPUT_DIM
 
 class ProjectionLayer(nn.Module):
     """
-    Bridges the gap between HeAR audio embeddings (1024) 
+    Bridges the gap between HeAR audio embeddings (512-dim) 
     and MedGemma LLM embedding space.
     """
     def __init__(self, input_dim: int = PROJECTION_INPUT_DIM, output_dim: int = 2560):
@@ -19,3 +19,4 @@ class ProjectionLayer(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.projection(x)
+

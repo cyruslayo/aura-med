@@ -8,15 +8,13 @@ from unittest.mock import MagicMock
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'mocks')))
 
-# Mock librosa before importing audio utils
-mock_librosa = MagicMock()
-sys.modules['librosa'] = mock_librosa
+import librosa
 
 from src.utils.audio import load_audio, normalize_duration
 
 class TestAudioUtils(unittest.TestCase):
     def setUp(self):
-        mock_librosa.reset_mock()
+        librosa.load.reset_mock()
 
     def test_load_audio_success(self):
         # Setup mock
@@ -28,7 +26,7 @@ class TestAudioUtils(unittest.TestCase):
         with unittest.mock.patch('os.path.exists', return_value=True):
             expected_sr = 16000
             dummy_audio = np.zeros(expected_sr * 5)
-            mock_librosa.load.return_value = (dummy_audio, expected_sr)
+            librosa.load.return_value = (dummy_audio, expected_sr)
             
             # Execute
             audio, sr = load_audio(audio_path, sr=expected_sr)
@@ -36,7 +34,7 @@ class TestAudioUtils(unittest.TestCase):
             # Verify
             self.assertEqual(sr, expected_sr)
             self.assertEqual(len(audio), expected_sr * 5)
-            mock_librosa.load.assert_called_once_with(audio_path, sr=expected_sr, mono=True)
+            librosa.load.assert_called_once_with(audio_path, sr=expected_sr, mono=True)
 
     def test_normalize_duration_truncation(self):
         sr = 16000

@@ -9,7 +9,7 @@ import torch
 import numpy as np
 from src.models.hear_encoder import HeAREncoder
 from src.models.medgemma import MedGemmaReasoning
-from src.models.data_types import PatientVitals, TriageResult, TriageStatus
+from src.datatypes import PatientVitals, TriageResult, TriageStatus
 
 class TestModels(unittest.TestCase):
     def setUp(self):
@@ -22,19 +22,19 @@ class TestModels(unittest.TestCase):
             with unittest.mock.patch('src.models.hear_encoder.normalize_duration') as mock_norm:
                 # Setup mocks
                 sr = 16000
-                dummy_audio = np.zeros(sr * 5)
+                dummy_audio = np.random.uniform(-0.1, 0.1, sr * 5).astype(np.float32)
                 mock_load.return_value = (dummy_audio, sr)
-                mock_norm.return_value = np.zeros(sr * 10)
+                mock_norm.return_value = np.random.uniform(-0.1, 0.1, sr * 10).astype(np.float32)
                 
                 embedding = self.hear.encode("dummy.wav")
                 self.assertIsInstance(embedding, torch.Tensor)
-                self.assertEqual(embedding.shape, (1, 1024))
+                self.assertEqual(embedding.shape, (1, 512))
                 
                 mock_load.assert_called_once()
                 mock_norm.assert_called_once()
 
     def test_medgemma_generation(self):
-        embedding = torch.randn(1, 1024)
+        embedding = torch.randn(1, 512)
         vitals = PatientVitals(age_months=12, respiratory_rate=30)
         result = self.medgemma.generate(embedding, vitals)
         
