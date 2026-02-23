@@ -211,7 +211,7 @@ Existing solutions either use acoustic analysis (without medical reasoning) or L
 | Component | Source | Role |
 |-----------|--------|------|
 | HeAR | Google (2024) | Acoustic understanding |
-| MedGemma 2B | Google (2025) | Clinical reasoning |
+| MedGemma 1.5 4B-IT | Google (2025) | Clinical reasoning |
 | Projection Layer | Our contribution | Learned audio-to-text alignment |
 
 The projection layer uses learned audio-to-text alignment, trained on supervised cough-to-diagnosis pairs, to bridge the semantic gap between acoustic embeddings and clinical language.

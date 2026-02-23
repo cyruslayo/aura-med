@@ -22,6 +22,8 @@ def setup_global_mocks():
                 def to(self, *args, **kwargs): return self
                 def cuda(self, *args, **kwargs): return self
                 def parameters(self): return []
+                def eval(self): return self
+                def train(self, mode=True): return self
             m.nn.Module = MockModule
             
             class MockTensor:
@@ -35,6 +37,13 @@ def setup_global_mocks():
                 def to(self, *args, **kwargs): return self
                 def size(self): return self.shape
                 def float(self): return self
+                def squeeze(self): return self
+                def detach(self): return self
+                def cpu(self): return self
+                def numpy(self):
+                    import numpy as np
+                    dim = self.shape[-1] if self.shape else 512
+                    return np.random.randn(dim).astype(np.float32)
             
             def mock_randn(*args, **kwargs):
                 return MockTensor(*args)
@@ -44,10 +53,18 @@ def setup_global_mocks():
             m.cuda.is_available.return_value = False
             m.float32 = "float32"
             m.float16 = "float16"
+            
+            # Mock torch.no_grad as a context manager
+            class MockNoGrad:
+                def __enter__(self): return self
+                def __exit__(self, *args): pass
+            m.no_grad = MockNoGrad
         elif module_name == "torch.nn":
             class MockModule:
                 def __init__(self, *args, **kwargs): pass
                 def __call__(self, *args, **kwargs): return MockTensor((1, 512))
+                def eval(self): return self
+                def train(self, mode=True): return self
             m.Module = MockModule
             m.Linear = MagicMock
             m.ReLU = MagicMock

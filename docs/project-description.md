@@ -21,7 +21,7 @@ Aura-Med functions as a **"Digital Resident"** that "hears" and "reasons." It co
 ### Key Features:
 
 * **Multimodal Bioacoustics:** Uses the **HeAR (Health Acoustic Representations)** model to analyze cough sounds for clinical biomarkers (crackles, wheezes).
-* **Agentic Reasoning:** Uses **MedGemma 2B** to ingest acoustic signatures and patient vitals to generate a **Chain-of-Thought (CoT)** reasoning trace.
+* **Agentic Reasoning:** Uses **MedGemma 1.5 4B-IT** to ingest acoustic signatures and patient vitals to generate a **Chain-of-Thought (CoT)** reasoning trace.
 * **Edge-Native:** Entirely offline inference using quantized models (INT4/GGUF) optimized for mobile hardware via **LiteRT**.
 * **Protocol-Aligned:** Outputs are strictly mapped to the **WHO Integrated Management of Childhood Illness (IMCI)** guidelines.
 

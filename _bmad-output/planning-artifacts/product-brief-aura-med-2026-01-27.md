@@ -16,7 +16,7 @@ author: Cyrus
 
 **Aura-Med** is a multimodal, offline-first clinical decision support system that empowers Community Health Workers (CHWs) in Nigeria and other low-resource settings to diagnose respiratory diseases—particularly pneumonia and tuberculosis—with the accuracy of a trained clinician, using only a smartphone and a patient's cough recording.
 
-By fusing Google's **HeAR** (Health Acoustic Representations) bioacoustic encoder with **MedGemma 2B** clinical reasoning, Aura-Med transforms a 5-second audio recording into a WHO IMCI-aligned triage recommendation in under 10 seconds—**no internet required, no cloud dependency**.
+By fusing Google's **HeAR** (Health Acoustic Representations) bioacoustic encoder with **MedGemma 1.5 4B-IT** clinical reasoning, Aura-Med transforms a 5-second audio recording into a WHO IMCI-aligned triage recommendation in under 10 seconds—**no internet required, no cloud dependency**.
 
 > **Why Now?** This exact stack was impossible to build 12 months ago. MedGemma's clinical reasoning and HeAR's acoustic biomarker extraction only became available in 2025. Aura-Med is the first solution to fuse these capabilities for edge deployment.
 

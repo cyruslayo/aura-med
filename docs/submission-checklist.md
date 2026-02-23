@@ -4,7 +4,7 @@ The "Winning Submission" Checklist
 1. Effective Use of HAI-DEF (20%)
 [ ] Multimodal Synergy: Does the documentation clearly explain the bridge between HeAR (audio) and MedGemma (reasoning)?
 
-[ ] Model Selection: Is the choice of MedGemma 2B justified for the edge/offline requirement?
+[ ] Model Selection: Is the choice of MedGemma 1.5 4B-IT (INT4 quantized) justified for the edge/offline requirement?
 
 [ ] Full Potential: Have you demonstrated that MedGemma is doing more than just "chatting"—is it performing complex WHO-aligned triage?
 

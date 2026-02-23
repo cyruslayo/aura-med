@@ -11,7 +11,11 @@ MAX_RAM_GB = 4.0
 MAX_INFERENCE_TIME_SEC = 10.0
 
 # --- Model Paths ---
-MEDGEMMA_MODEL_PATH = "google/medgemma-4b-it"
+# MedGemma 1.5 4B-IT: latest generation (Gemma 3 based), stronger clinical
+# reasoning with expanded medical imaging + EHR understanding.
+# INT4 quantization (BitsAndBytes) brings effective VRAM to ~2.5GB,
+# fitting within Colab T4 and edge-deployment budgets.
+MEDGEMMA_MODEL_PATH = "google/medgemma-1.5-4b-it"
 
 # --- Dataset Paths ---
 if IS_COLAB:

@@ -7,7 +7,7 @@ from src.models.hear_encoder import HeAREncoder
 from src.models.medgemma import MedGemmaReasoning
 from src.agent.safety import SafetyGuard
 from src.datatypes import PatientVitals, TriageResult, TriageStatus, DangerSignException, LowQualityError
-from src.agent.protocols import WHOIMCIProtocol
+from src.agent.protocols import WHORespiratoryProtocol
 from src.config import MAX_INFERENCE_TIME_SEC
 from src.utils.resource_audit import audit_resources
 
@@ -90,7 +90,7 @@ class AuraMedAgent:
                 status=TriageStatus.RED,
                 confidence=1.0,
                 reasoning=str(e),
-                action_recommendation=WHOIMCIProtocol.get_action(TriageStatus.RED)
+                action_recommendation=WHORespiratoryProtocol.get_action(TriageStatus.RED, vitals.age_months)
             )
             return self._finalize_result(result, start_time)
 
@@ -110,7 +110,7 @@ class AuraMedAgent:
             result = self.medgemma_reasoning.generate(embedding, vitals)
             
             # H5: Protocol Enforcement - Override/Enrich with standard WHO actions
-            result.action_recommendation = WHOIMCIProtocol.get_action(result.status)
+            result.action_recommendation = WHORespiratoryProtocol.get_action(result.status, vitals.age_months)
             
             return self._finalize_result(result, start_time)
 
@@ -120,7 +120,7 @@ class AuraMedAgent:
                 status=TriageStatus.INCONCLUSIVE,
                 confidence=0.0,
                 reasoning=f"Inconclusive: {str(e)}. Please re-record in a quieter environment.",
-                action_recommendation=WHOIMCIProtocol.get_action(TriageStatus.INCONCLUSIVE)
+                action_recommendation=WHORespiratoryProtocol.get_action(TriageStatus.INCONCLUSIVE, vitals.age_months)
             )
             return self._finalize_result(result, start_time)
         except Exception as e:

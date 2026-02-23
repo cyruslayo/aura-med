@@ -180,8 +180,22 @@ class TestAuraMedAgentPredict:
         result = agent.predict("test.wav", sample_vitals)
         
         assert result.status == TriageStatus.YELLOW
-        # Task 2: Verify action recommendation was injected from protocol
+        # Task 2: Verify age-adaptive action recommendation was injected (18 mo -> child)
         assert result.action_recommendation == "Administer oral Amoxicillin. Follow up in 48 hours."
+
+    @patch('src.agent.core.os.path.exists')
+    def test_predict_enriches_adult_yellow_result(self, mock_exists, mock_encoder, mock_reasoning):
+        """Verify adult YELLOW result gets adult-specific recommendation."""
+        mock_exists.return_value = True
+        adult_vitals = PatientVitals(age_months=420, respiratory_rate=25, danger_signs=False)
+        mock_reasoning.generate.return_value = TriageResult(
+            status=TriageStatus.YELLOW,
+            confidence=0.8,
+            reasoning="Adult respiratory distress."
+        )
+        agent = AuraMedAgent(hear_encoder=mock_encoder, medgemma_reasoning=mock_reasoning)
+        result = agent.predict("test.wav", adult_vitals)
+        assert "clinical evaluation" in result.action_recommendation.lower()
 
     @patch('src.agent.core.os.path.exists')
     def test_predict_enriches_green_result(self, mock_exists, mock_encoder, mock_reasoning, sample_vitals):

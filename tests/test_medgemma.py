@@ -21,8 +21,15 @@ class TestMedGemma(unittest.TestCase):
         vitals = PatientVitals(age_months=12, respiratory_rate=60, danger_signs=False)
         result = self.engine.generate(torch.randn(1, 1024), vitals)
         self.assertEqual(result.status, TriageStatus.YELLOW)
-        # Task 3: Check for standardized action recommendation in mock
-        self.assertEqual(result.action_recommendation, "Administer oral Amoxicillin. Follow up in 48 hours.")
+        # Check for age-adaptive action
+        self.assertIn("Amoxicillin", result.action_recommendation)
+
+    def test_mock_generation_adult_fast_breathing(self):
+        """Verify adult (420 mo) with RR=25 triggers YELLOW."""
+        vitals = PatientVitals(age_months=420, respiratory_rate=25, danger_signs=False)
+        result = self.engine.generate(torch.randn(1, 1024), vitals)
+        self.assertEqual(result.status, TriageStatus.YELLOW)
+        self.assertIn("clinical evaluation", result.action_recommendation.lower())
 
     def test_mock_generation_green(self):
         """L3: Verify GREEN mock generation uses standardized protocol."""
@@ -36,6 +43,13 @@ class TestMedGemma(unittest.TestCase):
         prompt = self.engine._construct_prompt(vitals)
         self.assertIn("Age: 6 months", prompt)
         self.assertIn("Respiratory Rate: 30", prompt)
+        self.assertIn("WHO IMCI (Pediatric)", prompt)
+
+    def test_prompt_construction_adult(self):
+        vitals = PatientVitals(age_months=420, respiratory_rate=16, danger_signs=False)
+        prompt = self.engine._construct_prompt(vitals)
+        self.assertIn("Age: 420 months", prompt)
+        self.assertIn("WHO IMAI (Adult/Adolescent)", prompt)
 
     def test_projection_layer_shapes(self):
         """Verify ProjectionLayer transforms HeAR embeddings to correct output dimension."""

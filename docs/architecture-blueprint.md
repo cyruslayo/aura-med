@@ -2,7 +2,7 @@
 
 ## 1. System Overview
 
-The **Aura-Med** architecture is a hybrid multimodal system that bridges a frozen bioacoustic encoder (**HeAR**) with a quantized large language model (**MedGemma 2B**). The system is designed for **asynchronous inference** on edge devices, where audio features and clinical text are fused via a learned projection layer.
+The **Aura-Med** architecture is a hybrid multimodal system that bridges a frozen bioacoustic encoder (**HeAR**) with a quantized large language model (**MedGemma 1.5 4B-IT**). The system is designed for **asynchronous inference** on edge devices, where audio features and clinical text are fused via a learned projection layer.
 
 ---
 
@@ -15,9 +15,9 @@ The **Aura-Med** architecture is a hybrid multimodal system that bridges a froze
 * **Output:** 512-dimensional embedding vector ().
 * **Status:** Frozen (No gradient updates during primary training).
 
-### 2.2 The Reasoning Brain: MedGemma 2B
+### 2.2 The Reasoning Brain: MedGemma 1.5 4B-IT
 
-* **Foundation:** `google/medgemma-2b-it`.
+* **Foundation:** `google/medgemma-1.5-4b-it`.
 * **Architecture:** Transformer Decoder (Gemma-based).
 * **Hidden Dimension ():** 2048.
 * **Quantization:** INT4-bit (via BitsAndBytes for training, LiteRT for deployment).

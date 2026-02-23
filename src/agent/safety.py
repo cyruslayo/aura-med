@@ -2,7 +2,8 @@ from src.datatypes import DangerSignException, LowQualityError, LowConfidenceErr
 
 class SafetyGuard:
     """
-    Electronic Guardrail following WHO IMCI protocols.
+    Electronic Guardrail following standard WHO respiratory triage protocols.
+    Ensures safety by flagging life-threatening danger signs immediately.
     """
     @staticmethod
     def check(vitals: "PatientVitals") -> None:

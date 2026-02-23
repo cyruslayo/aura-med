@@ -36,8 +36,8 @@ DIAGNOSIS_TO_TRIAGE: Dict[str, TriageStatus] = {
 }
 
 # Default vitals when age metadata is unavailable
-DEFAULT_VITALS_SICK = PatientVitals(age_months=18, respiratory_rate=55, danger_signs=False)
-DEFAULT_VITALS_HEALTHY = PatientVitals(age_months=18, respiratory_rate=28, danger_signs=False)
+DEFAULT_VITALS_SICK = PatientVitals(age_months=540, respiratory_rate=28, danger_signs=False)   # Adult default
+DEFAULT_VITALS_HEALTHY = PatientVitals(age_months=540, respiratory_rate=16, danger_signs=False) # Adult default
 
 
 @dataclass
@@ -205,7 +205,8 @@ class ICBHIDataset:
         self, 
         n: int = 5, 
         diagnosis: Optional[str] = None,
-        shuffle: bool = True
+        shuffle: bool = True,
+        mode: str = "demo"
     ) -> List[ICBHISample]:
         """
         Get N samples from the dataset, optionally filtered by diagnosis.
@@ -215,10 +216,16 @@ class ICBHIDataset:
             diagnosis: Filter to a specific diagnosis (e.g. "Pneumonia").
                        If None, samples from all diagnoses.
             shuffle: Whether to randomly shuffle before selecting.
+            mode: "demo" uses diagnosis-aligned vitals for demo journeys.
+                  "validation" uses neutral vitals (RR=35) so the model
+                  must rely on HeAR audio features, not baked-in vitals.
             
         Returns:
             List of ICBHISample objects with audio path, expected triage, and vitals.
         """
+        if mode not in ("demo", "validation"):
+            raise ValueError(f"mode must be 'demo' or 'validation', got '{mode}'")
+
         if diagnosis:
             pool = self.samples_by_diagnosis.get(diagnosis, [])
             if not pool:
@@ -255,19 +262,34 @@ class ICBHIDataset:
             else:
                 age_months = 18  # Default
             
-            # Set respiratory rate based on expected condition
-            if expected == TriageStatus.YELLOW:
+            if mode == "validation":
+                # Neutral vitals — model must rely on acoustic features
+                # Use a rate that is "Normal" for whatever age the patient is
+                from src.datatypes import get_fast_breathing_threshold
+                threshold = get_fast_breathing_threshold(age_months)
+                
                 vitals = PatientVitals(
                     age_months=age_months,
-                    respiratory_rate=55,  # Fast breathing for age
+                    respiratory_rate=threshold - 5,  # Consistently below threshold
                     danger_signs=False
                 )
             else:
-                vitals = PatientVitals(
-                    age_months=age_months,
-                    respiratory_rate=28,  # Normal
-                    danger_signs=False
-                )
+                # Demo mode — diagnosis-aligned vitals for predictable output
+                from src.datatypes import get_fast_breathing_threshold
+                threshold = get_fast_breathing_threshold(age_months)
+                
+                if expected == TriageStatus.YELLOW:
+                    vitals = PatientVitals(
+                        age_months=age_months,
+                        respiratory_rate=threshold + 10,  # Fast breathing for age
+                        danger_signs=False
+                    )
+                else:
+                    vitals = PatientVitals(
+                        age_months=age_months,
+                        respiratory_rate=threshold - 8,  # Normal
+                        danger_signs=False
+                    )
             
             samples.append(ICBHISample(
                 audio_path=audio_path,
@@ -278,6 +300,15 @@ class ICBHIDataset:
             ))
         
         return samples
+
+    def get_validation_samples(
+        self,
+        n: int = 10,
+        diagnosis: Optional[str] = None,
+        shuffle: bool = True
+    ) -> List[ICBHISample]:
+        """Convenience method: get samples with neutral vitals for unbiased validation."""
+        return self.get_samples(n=n, diagnosis=diagnosis, shuffle=shuffle, mode="validation")
     
     def summary(self) -> str:
         """Return a human-readable summary of the loaded dataset."""

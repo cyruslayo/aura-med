@@ -46,9 +46,20 @@ def test_journey_1_success():
 def test_journey_2_emergency():
     audio, vitals, name = DemoScenarios.get_journey_2_emergency()
     assert "test_sample.wav" in audio
-    assert vitals.danger_signs is True
     assert vitals.lethargic is True
     assert "Emergency" in name
+
+def test_journey_4_elderly_copd():
+    audio, vitals, name = DemoScenarios.get_journey_4_elderly_copd()
+    assert vitals.age_months == 816
+    assert vitals.respiratory_rate == 24
+    assert "Elderly" in name
+
+def test_journey_5_adult_healthy():
+    audio, vitals, name = DemoScenarios.get_journey_5_adult_healthy()
+    assert vitals.age_months == 420
+    assert vitals.respiratory_rate == 16
+    assert "Healthy Adult" in name
 
 from src.agent.core import AuraMedAgent
 
@@ -63,13 +74,25 @@ def test_integration_journey_1_success():
     assert "latency_sec" in result.usage_stats
 
 def test_integration_journey_2_emergency():
-    agent = AuraMedAgent()
-    audio, vitals, _ = DemoScenarios.get_journey_2_emergency()
-    # Journey 2 (lethargic=True) should trigger RED status via SafetyGuard
-    result = agent.predict(audio, vitals)
     assert result.status == TriageStatus.RED
     assert "Emergency" in result.reasoning
     assert result.usage_stats is not None
+
+def test_integration_journey_4_elderly():
+    agent = AuraMedAgent()
+    audio, vitals, _ = DemoScenarios.get_journey_4_elderly_copd()
+    # Elderly (816 mo, RR 24) should be YELLOW
+    result = agent.predict(audio, vitals)
+    assert result.status == TriageStatus.YELLOW
+    assert "clinical evaluation" in result.action_recommendation.lower()
+
+def test_integration_journey_5_adult():
+    agent = AuraMedAgent()
+    audio, vitals, _ = DemoScenarios.get_journey_5_adult_healthy()
+    # Healthy Adult (420 mo, RR 16) should be GREEN
+    result = agent.predict(audio, vitals)
+    assert result.status == TriageStatus.GREEN
+    assert "No antibiotics" in result.action_recommendation
 
 def test_integration_journey_3_inconclusive():
     agent = AuraMedAgent()

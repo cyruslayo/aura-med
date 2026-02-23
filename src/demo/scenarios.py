@@ -59,6 +59,32 @@ class DemoScenarios:
         return low_quality_path, vitals, "Journey 3: Inconclusive (Low Quality Audio)"
     
     @staticmethod
+    def get_journey_4_elderly_copd():
+        """
+        Scenario: 68-year-old with slightly elevated respiratory rate (24 bpm).
+        Expected: YELLOW Triage (COPD/Chronic Suspected) -> Action: Clinical evaluation.
+        """
+        vitals = PatientVitals(
+            age_months=816,  # 68 years
+            respiratory_rate=24,  # > 20 is fast for adults
+            danger_signs=False
+        )
+        return DemoScenarios.DEFAULT_AUDIO, vitals, "Journey 4: Adult/Elderly Triage (COPD Suspected)"
+
+    @staticmethod
+    def get_journey_5_adult_healthy():
+        """
+        Scenario: 35-year-old with normal breathing.
+        Expected: GREEN Triage -> Action: Supportive care.
+        """
+        vitals = PatientVitals(
+            age_months=420,  # 35 years
+            respiratory_rate=16,
+            danger_signs=False
+        )
+        return DemoScenarios.DEFAULT_AUDIO, vitals, "Journey 5: Healthy Adult (Normal Breathing)"
+    
+    @staticmethod
     def _create_silent_audio(path: str, duration_sec: float = 3.0, sr: int = 16000):
         """
         Create a near-silent WAV file that will trigger the encoder's noise gate.
